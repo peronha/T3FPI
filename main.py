@@ -26,6 +26,8 @@ def pollChanges(frame):
     is_grayscale = cv2.getTrackbarPos('Cinza', 'Efeitos')
     is_resize = cv2.getTrackbarPos('Reduzir', 'Efeitos')
     is_negative = cv2.getTrackbarPos('Negativo', 'Efeitos')
+    contrast_value = cv2.getTrackbarPos('Contraste', 'Efeitos')
+    brightness_value = cv2.getTrackbarPos('Brilho', 'Efeitos')
 
     frame = cv2.GaussianBlur(frame, (blur_kernel, blur_kernel), 0);
 
@@ -38,10 +40,14 @@ def pollChanges(frame):
     if is_negative == 1:
         frame = cv2.bitwise_not(frame)
 
-
     if is_resize == 1:
         frame = cv2.resize(frame, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_CUBIC)
 
+    if contrast_value > 0:
+        frame = cv2.addWeighted(frame, contrast_value + 1, np.zeros(frame.shape, frame.dtype), 0, brightness_value)
+
+    if brightness_value > 0:
+        frame = cv2.addWeighted(frame, 1, np.zeros(frame.shape, frame.dtype), 0, brightness_value)
 
     return frame
 
@@ -59,13 +65,16 @@ def criaJanelaEfeitos():
     cv2.createTrackbar('Cinza', 'Efeitos', 0, 1, nothing)
     cv2.createTrackbar('Reduzir', 'Efeitos', 0, 1, nothing)
     cv2.createTrackbar('Negativo', 'Efeitos', 0, 1, nothing)
-
+    cv2.createTrackbar('Contraste', 'Efeitos', 0, 5, nothing)
+    cv2.createTrackbar('Brilho', 'Efeitos', 0, 100, nothing)
 
 def __main__():
 
     cap = cv2.VideoCapture(0)
 
     criaJanelaEfeitos()
+
+    out = cv2.VideoWriter('output.avi', -1, 20.0, (640, 480))
 
     while(True):
         # Capture frame-by-frame
