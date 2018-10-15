@@ -74,7 +74,8 @@ def __main__():
 
     criaJanelaEfeitos()
 
-    out = cv2.VideoWriter('output.avi', -1, 20.0, (640, 480))
+
+    gravar = 0
 
     while(True):
         # Capture frame-by-frame
@@ -84,8 +85,17 @@ def __main__():
 
         cv2.imshow('Captura de Video',new_frame)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if (gravar == 1):
+            out.write(new_frame)
+
+        k = cv2.waitKey(1)
+        if k == ord('q'):
             break
+        if k == ord('g'):
+            out = cv2.VideoWriter('gravacao.avi', -1, 20.0, (640, 480))
+            gravar = 1
+        if k == ord('s'):
+            out.release()
 
     # When everything done, release the capture
     cap.release()
